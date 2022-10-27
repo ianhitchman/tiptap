@@ -61,67 +61,158 @@ const MenuBar = ({ editor }) => {
 
   return (
     <>
-      <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
+      <button
+        onClick={() => editor
+          .chain()
+          .focus()
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          .run()
+        }
+      >
         insertTable
       </button>
-      <button onClick={() => editor.chain().focus().insertContent(tableHTML, {
-        parseOptions: {
-          preserveWhitespace: false,
-        },
-      }).run()}>
+      <button
+        onClick={() => editor
+          .chain()
+          .focus()
+          .insertContent(tableHTML, {
+            parseOptions: {
+              preserveWhitespace: false,
+            },
+          })
+          .run()
+        }
+      >
         insertHTMLTable
       </button>
-      <button onClick={() => editor.chain().focus().addColumnBefore().run()} disabled={!editor.can().addColumnBefore()}>
+      <button
+        onClick={() => editor.chain().focus().addColumnBefore().run()}
+        disabled={!editor.can().addColumnBefore()}
+      >
         addColumnBefore
       </button>
-      <button onClick={() => editor.chain().focus().addColumnAfter().run()} disabled={!editor.can().addColumnAfter()}>
+      <button
+        onClick={() => editor.chain().focus().addColumnAfter().run()}
+        disabled={!editor.can().addColumnAfter()}
+      >
         addColumnAfter
       </button>
-      <button onClick={() => editor.chain().focus().deleteColumn().run()} disabled={!editor.can().deleteColumn()}>
+      <button
+        onClick={() => editor.chain().focus().deleteColumn().run()}
+        disabled={!editor.can().deleteColumn()}
+      >
         deleteColumn
       </button>
-      <button onClick={() => editor.chain().focus().addRowBefore().run()} disabled={!editor.can().addRowBefore()}>
+      <button
+        onClick={() => editor.chain().focus().addRowBefore().run()}
+        disabled={!editor.can().addRowBefore()}
+      >
         addRowBefore
       </button>
-      <button onClick={() => editor.chain().focus().addRowAfter().run()} disabled={!editor.can().addRowAfter()}>
+      <button
+        onClick={() => editor.chain().focus().addRowAfter().run()}
+        disabled={!editor.can().addRowAfter()}
+      >
         addRowAfter
       </button>
-      <button onClick={() => editor.chain().focus().deleteRow().run()} disabled={!editor.can().deleteRow()}>
+      <button
+        onClick={() => editor.chain().focus().deleteRow().run()}
+        disabled={!editor.can().deleteRow()}
+      >
         deleteRow
       </button>
-      <button onClick={() => editor.chain().focus().deleteTable().run()} disabled={!editor.can().deleteTable()}>
+      <button
+        onClick={() => editor.chain().focus().deleteTable().run()}
+        disabled={!editor.can().deleteTable()}
+      >
         deleteTable
       </button>
-      <button onClick={() => editor.chain().focus().mergeCells().run()} disabled={!editor.can().mergeCells()}>
+      <button
+        onClick={() => editor.chain().focus().mergeCells().run()}
+        disabled={!editor.can().mergeCells()}
+      >
         mergeCells
       </button>
-      <button onClick={() => editor.chain().focus().splitCell().run()} disabled={!editor.can().splitCell()}>
+      <button
+        onClick={() => editor.chain().focus().splitCell().run()}
+        disabled={!editor.can().splitCell()}
+      >
         splitCell
       </button>
-      <button onClick={() => editor.chain().focus().toggleHeaderColumn().run()} disabled={!editor.can().toggleHeaderColumn()}>
+      <button
+        onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
+        disabled={!editor.can().toggleHeaderColumn()}
+      >
         toggleHeaderColumn
       </button>
-      <button onClick={() => editor.chain().focus().toggleHeaderRow().run()} disabled={!editor.can().toggleHeaderRow()}>
-        toggleHeaderRow
+      <button
+        onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+        disabled={!editor.can().toggleHeaderRow()}
+      >
+        {editor.can().tableHasHeader() && <>* toggleHeaderRow</>}
+        {!editor.can().tableHasHeader() && <>toggleHeaderRow</>}
       </button>
-      <button onClick={() => editor.chain().focus().toggleHeaderCell().run()} disabled={!editor.can().toggleHeaderCell()}>
+      <button
+        onClick={() => editor.chain().focus().toggleHeaderCell().run()}
+        disabled={!editor.can().toggleHeaderCell()}
+      >
         toggleHeaderCell
       </button>
-      <button onClick={() => editor.chain().focus().mergeOrSplit().run()} disabled={!editor.can().mergeOrSplit()}>
+      <button
+        onClick={() => editor.chain().focus().mergeOrSplit().run()}
+        disabled={!editor.can().mergeOrSplit()}
+      >
         mergeOrSplit
       </button>
-      <button onClick={() => editor.chain().focus().setCellAttribute('backgroundColor', '#FAF594').run()} disabled={!editor.can().setCellAttribute('backgroundColor', '#FAF594')}>
+      <button
+        onClick={() => editor
+          .chain()
+          .focus()
+          .setCellAttribute('backgroundColor', '#FAF594')
+          .run()
+        }
+        disabled={!editor.can().setCellAttribute('backgroundColor', '#FAF594')}
+      >
         setCellAttribute
       </button>
-      <button onClick={() => editor.chain().focus().fixTables().run()} disabled={!editor.can().fixTables()}>
+      <button
+        onClick={() => editor.chain().focus().fixTables().run()}
+        disabled={!editor.can().fixTables()}
+      >
         fixTables
       </button>
-      <button onClick={() => editor.chain().focus().goToNextCell().run()} disabled={!editor.can().goToNextCell()}>
+      <button
+        onClick={() => editor.chain().focus().goToNextCell().run()}
+        disabled={!editor.can().goToNextCell()}
+      >
         goToNextCell
       </button>
-      <button onClick={() => editor.chain().focus().goToPreviousCell().run()} disabled={!editor.can().goToPreviousCell()}>
+      <button
+        onClick={() => editor.chain().focus().goToPreviousCell().run()}
+        disabled={!editor.can().goToPreviousCell()}
+      >
         goToPreviousCell
       </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleTableClass('table-fullwidth').run()
+        }
+      >
+        toggleTableClass(fullwidth)
+      </button>
+
+      <button
+        onClick={() => editor.chain().focus().toggleTableClass('table-centred').run()
+        }
+      >
+        {editor.can().tableHasClass('table-centred') && (
+          <>* toggleTableClass(centred)</>
+        )}
+        {!editor.can().tableHasClass('table-centred') && (
+          <>toggleTableClass(centred)</>
+        )}
+      </button>
+      <button onClick={() => console.log(editor.getHTML())}>Get HTML</button>
     </>
   )
 }
@@ -152,10 +243,10 @@ export default () => {
       <p>
         Here is an example:
       </p>
-      <table>
+      <table class="tablestyle tablestyle2" data-foo="bar">
         <tbody>
           <tr>
-            <th>Name</th>
+            <th>Name!</th>
             <th colspan="3">Description</th>
           </tr>
           <tr>

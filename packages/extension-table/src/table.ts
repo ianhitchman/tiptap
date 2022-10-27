@@ -32,50 +32,62 @@ import { createTable } from './utilities/createTable'
 import { deleteTableWhenAllCellsSelected } from './utilities/deleteTableWhenAllCellsSelected'
 
 export interface TableOptions {
-  HTMLAttributes: Record<string, any>,
-  resizable: boolean,
-  handleWidth: number,
-  cellMinWidth: number,
-  View: NodeView,
-  lastColumnResizable: boolean,
-  allowTableNodeSelection: boolean,
+  HTMLAttributes: Record<string, any>;
+  resizable: boolean;
+  handleWidth: number;
+  cellMinWidth: number;
+  View: NodeView;
+  lastColumnResizable: boolean;
+  allowTableNodeSelection: boolean;
 }
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     table: {
-      insertTable: (options?: { rows?: number, cols?: number, withHeaderRow?: boolean }) => ReturnType,
-      addColumnBefore: () => ReturnType,
-      addColumnAfter: () => ReturnType,
-      deleteColumn: () => ReturnType,
-      addRowBefore: () => ReturnType,
-      addRowAfter: () => ReturnType,
-      deleteRow: () => ReturnType,
-      deleteTable: () => ReturnType,
-      mergeCells: () => ReturnType,
-      splitCell: () => ReturnType,
-      toggleHeaderColumn: () => ReturnType,
-      toggleHeaderRow: () => ReturnType,
-      toggleHeaderCell: () => ReturnType,
-      mergeOrSplit: () => ReturnType,
-      setCellAttribute: (name: string, value: any) => ReturnType,
-      goToNextCell: () => ReturnType,
-      goToPreviousCell: () => ReturnType,
-      fixTables: () => ReturnType,
-      setCellSelection: (position: { anchorCell: number, headCell?: number }) => ReturnType,
-    }
+      insertTable: (options?: {
+        rows?: number;
+        cols?: number;
+        withHeaderRow?: boolean;
+      }) => ReturnType;
+      addColumnBefore: () => ReturnType;
+      addColumnAfter: () => ReturnType;
+      deleteColumn: () => ReturnType;
+      addRowBefore: () => ReturnType;
+      addRowAfter: () => ReturnType;
+      deleteRow: () => ReturnType;
+      deleteTable: () => ReturnType;
+      mergeCells: () => ReturnType;
+      splitCell: () => ReturnType;
+      toggleHeaderColumn: () => ReturnType;
+      toggleHeaderRow: () => ReturnType;
+      toggleHeaderCell: () => ReturnType;
+      mergeOrSplit: () => ReturnType;
+      setCellAttribute: (name: string, value: any) => ReturnType;
+      goToNextCell: () => ReturnType;
+      goToPreviousCell: () => ReturnType;
+      fixTables: () => ReturnType;
+      setCellSelection: (position: {
+        anchorCell: number;
+        headCell?: number;
+      }) => ReturnType;
+      toggleTableClass: (className: string) => ReturnType;
+      tableHasClass: (className: string) => ReturnType;
+      tableHasHeader: () => ReturnType;
+    };
   }
 
   interface NodeConfig<Options, Storage> {
     /**
      * Table Role
      */
-    tableRole?: string | ((this: {
-      name: string,
-      options: Options,
-      storage: Storage,
-      parent: ParentConfig<NodeConfig<Options>>['tableRole'],
-    }) => string),
+    tableRole?:
+      | string
+      | ((this: {
+          name: string;
+          options: Options;
+          storage: Storage;
+          parent: ParentConfig<NodeConfig<Options>>['tableRole'];
+        }) => string);
   }
 }
 
@@ -105,99 +117,209 @@ export const Table = Node.create<TableOptions>({
   group: 'block',
 
   parseHTML() {
-    return [
-      { tag: 'table' },
-    ]
+    return [{ tag: 'table' }]
+  },
+
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      class: {
+        default: null,
+        parseHTML: element => element.getAttribute('class'),
+      },
+      ref: {
+        default: `table${Math.random().toString().substring(2)}`,
+      },
+    }
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['table', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), ['tbody', 0]]
+    return [
+      'table',
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      ['tbody', 0],
+    ]
   },
 
   addCommands() {
     return {
-      insertTable: ({ rows = 3, cols = 3, withHeaderRow = true } = {}) => ({ tr, dispatch, editor }) => {
-        const node = createTable(editor.schema, rows, cols, withHeaderRow)
+      insertTable:
+        ({ rows = 3, cols = 3, withHeaderRow = true } = {}) => ({ tr, dispatch, editor }) => {
+          const node = createTable(editor.schema, rows, cols, withHeaderRow)
 
-        if (dispatch) {
-          const offset = tr.selection.anchor + 1
+          if (dispatch) {
+            const offset = tr.selection.anchor + 1
 
-          tr.replaceSelectionWith(node)
-            .scrollIntoView()
-            .setSelection(TextSelection.near(tr.doc.resolve(offset)))
-        }
+            tr.replaceSelectionWith(node)
+              .scrollIntoView()
+              .setSelection(TextSelection.near(tr.doc.resolve(offset)))
+          }
 
-        return true
-      },
-      addColumnBefore: () => ({ state, dispatch }) => {
-        return addColumnBefore(state, dispatch)
-      },
-      addColumnAfter: () => ({ state, dispatch }) => {
-        return addColumnAfter(state, dispatch)
-      },
-      deleteColumn: () => ({ state, dispatch }) => {
-        return deleteColumn(state, dispatch)
-      },
-      addRowBefore: () => ({ state, dispatch }) => {
-        return addRowBefore(state, dispatch)
-      },
-      addRowAfter: () => ({ state, dispatch }) => {
-        return addRowAfter(state, dispatch)
-      },
-      deleteRow: () => ({ state, dispatch }) => {
-        return deleteRow(state, dispatch)
-      },
-      deleteTable: () => ({ state, dispatch }) => {
-        return deleteTable(state, dispatch)
-      },
-      mergeCells: () => ({ state, dispatch }) => {
-        return mergeCells(state, dispatch)
-      },
-      splitCell: () => ({ state, dispatch }) => {
-        return splitCell(state, dispatch)
-      },
-      toggleHeaderColumn: () => ({ state, dispatch }) => {
-        return toggleHeader('column')(state, dispatch)
-      },
-      toggleHeaderRow: () => ({ state, dispatch }) => {
-        return toggleHeader('row')(state, dispatch)
-      },
-      toggleHeaderCell: () => ({ state, dispatch }) => {
-        return toggleHeaderCell(state, dispatch)
-      },
-      mergeOrSplit: () => ({ state, dispatch }) => {
-        if (mergeCells(state, dispatch)) {
           return true
-        }
+        },
+      addColumnBefore:
+        () => ({ state, dispatch }) => {
+          return addColumnBefore(state, dispatch)
+        },
+      addColumnAfter:
+        () => ({ state, dispatch }) => {
+          return addColumnAfter(state, dispatch)
+        },
+      deleteColumn:
+        () => ({ state, dispatch }) => {
+          return deleteColumn(state, dispatch)
+        },
+      addRowBefore:
+        () => ({ state, dispatch }) => {
+          return addRowBefore(state, dispatch)
+        },
+      addRowAfter:
+        () => ({ state, dispatch }) => {
+          return addRowAfter(state, dispatch)
+        },
+      deleteRow:
+        () => ({ state, dispatch }) => {
+          return deleteRow(state, dispatch)
+        },
+      deleteTable:
+        () => ({ state, dispatch }) => {
+          return deleteTable(state, dispatch)
+        },
+      mergeCells:
+        () => ({ state, dispatch }) => {
+          return mergeCells(state, dispatch)
+        },
+      splitCell:
+        () => ({ state, dispatch }) => {
+          return splitCell(state, dispatch)
+        },
+      toggleHeaderColumn:
+        () => ({ state, dispatch }) => {
+          return toggleHeader('column')(state, dispatch)
+        },
+      toggleHeaderRow:
+        () => ({ state, dispatch }) => {
+          return toggleHeader('row')(state, dispatch)
+        },
+      toggleHeaderCell:
+        () => ({ state, dispatch }) => {
+          return toggleHeaderCell(state, dispatch)
+        },
+      mergeOrSplit:
+        () => ({ state, dispatch }) => {
+          if (mergeCells(state, dispatch)) {
+            return true
+          }
 
-        return splitCell(state, dispatch)
-      },
-      setCellAttribute: (name, value) => ({ state, dispatch }) => {
-        return setCellAttr(name, value)(state, dispatch)
-      },
-      goToNextCell: () => ({ state, dispatch }) => {
-        return goToNextCell(1)(state, dispatch)
-      },
-      goToPreviousCell: () => ({ state, dispatch }) => {
-        return goToNextCell(-1)(state, dispatch)
-      },
-      fixTables: () => ({ state, dispatch }) => {
-        if (dispatch) {
-          fixTables(state)
-        }
+          return splitCell(state, dispatch)
+        },
+      setCellAttribute:
+        (name, value) => ({ state, dispatch }) => {
+          return setCellAttr(name, value)(state, dispatch)
+        },
+      goToNextCell:
+        () => ({ state, dispatch }) => {
+          return goToNextCell(1)(state, dispatch)
+        },
+      goToPreviousCell:
+        () => ({ state, dispatch }) => {
+          return goToNextCell(-1)(state, dispatch)
+        },
+      fixTables:
+        () => ({ state, dispatch }) => {
+          if (dispatch) {
+            fixTables(state)
+          }
 
-        return true
-      },
-      setCellSelection: position => ({ tr, dispatch }) => {
-        if (dispatch) {
-          const selection = CellSelection.create(tr.doc, position.anchorCell, position.headCell)
+          return true
+        },
+      setCellSelection:
+        position => ({ tr, dispatch }) => {
+          if (dispatch) {
+            const selection = CellSelection.create(
+              tr.doc,
+              position.anchorCell,
+              position.headCell,
+            )
 
-          // @ts-ignore
-          tr.setSelection(selection)
-        }
+            // @ts-ignore
+            tr.setSelection(selection)
+          }
 
-        return true
-      },
+          return true
+        },
+
+      tableHasHeader:
+        () => ({ state }) => {
+          const $pos = state.selection.$anchor
+
+          for (let d = $pos.depth; d > 0; d -= 1) {
+            const node = $pos.node(d)
+
+            if (node.type.spec.tableRole === 'table') {
+              const ref = node.attrs?.ref
+
+              if (!ref) { return false }
+              const tableThDom = document.querySelector(
+                `div.ProseMirror table[data-ref=${node.attrs.ref}] > tbody > tr > th, div.ProseMirror table[data-ref=${node.attrs.ref}] > thead > tr > th`,
+              )
+
+              if (tableThDom) { return true }
+            }
+          }
+          return false
+        },
+
+      tableHasClass:
+        className => ({ state }) => {
+          const $pos = state.selection.$anchor
+
+          for (let d = $pos.depth; d > 0; d -= 1) {
+            const node = $pos.node(d)
+
+            if (node.type.spec.tableRole === 'table') {
+              const classStr = node.attrs?.class || ''
+              const classList = classStr?.split(' ') || []
+              const classIndex = classList.indexOf(className)
+
+              if (classIndex >= 0) {
+                return true
+              }
+            }
+          }
+          return false
+        },
+
+      toggleTableClass:
+        className => ({ state }) => {
+          const $pos = state.selection.$anchor
+
+          for (let d = $pos.depth; d > 0; d -= 1) {
+            const node = $pos.node(d)
+
+            if (node.type.spec.tableRole === 'table') {
+              const classStr = node.attrs?.class || ''
+              const classList = classStr?.split(' ') || []
+              const classIndex = classList.indexOf(className)
+
+              if (classIndex >= 0) {
+                classList.splice(classIndex, 1)
+              } else {
+                classList.push(className)
+              }
+              const newClassStr = classList.join(' ')
+
+              state.tr.setNodeAttribute($pos.before(d), 'class', newClassStr)
+              const tableDom = document.querySelector(
+                `div.ProseMirror table[data-ref=${node.attrs.ref}]`,
+              )
+
+              if (tableDom) { tableDom.className = newClassStr }
+              return true
+            }
+          }
+          return false
+        },
     }
   },
 
@@ -212,11 +334,7 @@ export const Table = Node.create<TableOptions>({
           return false
         }
 
-        return this.editor
-          .chain()
-          .addRowAfter()
-          .goToNextCell()
-          .run()
+        return this.editor.chain().addRowAfter().goToNextCell().run()
       },
       'Shift-Tab': () => this.editor.commands.goToPreviousCell(),
       Backspace: deleteTableWhenAllCellsSelected,
@@ -230,14 +348,18 @@ export const Table = Node.create<TableOptions>({
     const isResizable = this.options.resizable && this.editor.isEditable
 
     return [
-      ...(isResizable ? [columnResizing({
-        handleWidth: this.options.handleWidth,
-        cellMinWidth: this.options.cellMinWidth,
-        View: this.options.View,
-        // TODO: PR for @types/prosemirror-tables
-        // @ts-ignore (incorrect type)
-        lastColumnResizable: this.options.lastColumnResizable,
-      })] : []),
+      ...(isResizable
+        ? [
+          columnResizing({
+            handleWidth: this.options.handleWidth,
+            cellMinWidth: this.options.cellMinWidth,
+            View: this.options.View,
+            // TODO: PR for @types/prosemirror-tables
+            // @ts-ignore (incorrect type)
+            lastColumnResizable: this.options.lastColumnResizable,
+          }),
+        ]
+        : []),
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection,
       }),
@@ -252,7 +374,9 @@ export const Table = Node.create<TableOptions>({
     }
 
     return {
-      tableRole: callOrReturn(getExtensionField(extension, 'tableRole', context)),
+      tableRole: callOrReturn(
+        getExtensionField(extension, 'tableRole', context),
+      ),
     }
   },
 })

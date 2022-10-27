@@ -2,7 +2,14 @@
 import { Node as ProseMirrorNode } from 'prosemirror-model'
 import { NodeView } from 'prosemirror-view'
 
-export function updateColumns(node: ProseMirrorNode, colgroup: Element, table: Element, cellMinWidth: number, overrideCol?: number, overrideValue?: any) {
+export function updateColumns(
+  node: ProseMirrorNode,
+  colgroup: Element,
+  table: Element,
+  cellMinWidth: number,
+  overrideCol?: number,
+  overrideValue?: any,
+) {
   let totalWidth = 0
   let fixedWidth = true
   let nextDOM = colgroup.firstChild
@@ -50,7 +57,6 @@ export function updateColumns(node: ProseMirrorNode, colgroup: Element, table: E
 }
 
 export class TableView implements NodeView {
-
   node: ProseMirrorNode
 
   cellMinWidth: number
@@ -69,6 +75,8 @@ export class TableView implements NodeView {
     this.dom = document.createElement('div')
     this.dom.className = 'tableWrapper'
     this.table = this.dom.appendChild(document.createElement('table'))
+    this.table.className = node.attrs?.class
+    this.table.setAttribute('data-ref', node.attrs?.ref)
     this.colgroup = this.table.appendChild(document.createElement('colgroup'))
     updateColumns(node, this.colgroup, this.table, cellMinWidth)
     this.contentDOM = this.table.appendChild(document.createElement('tbody'))
@@ -85,7 +93,13 @@ export class TableView implements NodeView {
     return true
   }
 
-  ignoreMutation(mutation: MutationRecord | { type: 'selection'; target: Element }) {
-    return mutation.type === 'attributes' && (mutation.target === this.table || this.colgroup.contains(mutation.target))
+  ignoreMutation(
+    mutation: MutationRecord | { type: 'selection'; target: Element },
+  ) {
+    return (
+      mutation.type === 'attributes'
+      && (mutation.target === this.table
+        || this.colgroup.contains(mutation.target))
+    )
   }
 }
